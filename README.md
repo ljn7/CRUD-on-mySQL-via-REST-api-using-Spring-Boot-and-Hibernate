@@ -1,4 +1,4 @@
-# curd-on-mySQL-using-spring-boot-and-hibernate
+# CRUD-on-mySQL-using-Spring-Boot-and-Hibernate
 CRUD operations on mySQL database using Spring Boot and Hibernate libray.
 
 * Unit test using Spring Boot.
