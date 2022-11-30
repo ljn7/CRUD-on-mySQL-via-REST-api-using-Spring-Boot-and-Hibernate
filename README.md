@@ -1,5 +1,5 @@
-# CRUD-on-mySQL-using-Spring-Boot-and-Hibernate
-CRUD operations on mySQL database using Spring Boot and Hibernate libray.
+# CRUD-on-mySQL-via-REST-api-using-Spring-Boot-and-Hibernate
+CRUD operations on mySQL database via REST api using Spring Boot and Hibernate libray.
 
 * Unit test using Spring Boot.
 * Configs are not hardcoded instead configured using properties file.
