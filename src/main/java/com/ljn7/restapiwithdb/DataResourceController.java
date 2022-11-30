@@ -22,7 +22,7 @@ public class DataResourceController {
     private static final String NOT_AN_ALPHABET_REGEX = "[^a-zA-Z]";
     private static final String NOT_AN_ALPHABET_FOR_NAME_REGEX = "[^a-zA-Z ]";
     private static final String NOT_A_NUMER_REGEX = "[^0-9]";
-    private static final String NOT_A_NUMBER_WITH_HYPEN_REGEX = "[^0-9-]";
+    private static final String NOT_A_NUMBER_WITH_HYPHEN_REGEX = "[^0-9-]";
 
     @GetMapping({ "users", "user" })
     public ResponseEntity<List<User>> getUsers() {
@@ -214,23 +214,23 @@ public class DataResourceController {
         if (age.isBlank())
             return getUsers();
 
-        Pattern pattern = Pattern.compile(NOT_A_NUMBER_WITH_HYPEN_REGEX);
+        Pattern pattern = Pattern.compile(NOT_A_NUMBER_WITH_HYPHEN_REGEX);
         int charPos = 0;
-        int charHypenCount = 0;
+        int charHYPHENCount = 0;
 
-        charHypenCount = (int) age.chars().filter(ch -> ch == '-').count();
+        charHYPHENCount = (int) age.chars().filter(ch -> ch == '-').count();
 
         System.out.println("2");
-        // if contains more than 1 hypen and Negation of numbers and hypen then return.
-        if (charHypenCount > 1 ||
+        // if contains more than 1 HYPHEN and Negation of numbers and HYPHEN then return.
+        if (charHYPHENCount > 1 ||
                 pattern.matcher(age).find())
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 
         charPos = age.indexOf('-');
 
         System.out.println("3");
-        // if only hypen contains in age AND age len is equals to one OR
-        // if Hypen is at index 0 and followed by characters OR if Hypen is at index End
+        // if only HYPHEN contains in age AND age len is equals to one OR
+        // if HYPHEN is at index 0 and followed by characters OR if HYPHEN is at index End
         // then return bad req
         if ((charPos != -1 && age.length() == 1) ||
                 (charPos == 0 || (charPos == age.length() - 1)))
