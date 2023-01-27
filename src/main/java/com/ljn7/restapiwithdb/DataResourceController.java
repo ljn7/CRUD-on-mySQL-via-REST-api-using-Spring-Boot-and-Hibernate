@@ -19,10 +19,14 @@ public class DataResourceController {
     @Autowired
     SqlDataController datacontroller;
 
-    private static final String NOT_AN_ALPHABET_REGEX = "[^a-zA-Z]";
-    private static final String NOT_AN_ALPHABET_FOR_NAME_REGEX = "[^a-zA-Z ]";
-    private static final String NOT_A_NUMER_REGEX = "[^0-9]";
-    private static final String NOT_A_NUMBER_WITH_HYPHEN_REGEX = "[^0-9-]";
+    // private static final String NOT_AN_ALPHABET_REGEX = "[^a-zA-Z]";
+    // private static final String NOT_AN_ALPHABET_FOR_NAME_REGEX = "[^a-zA-Z ]";
+    // private static final String NOT_A_NUMER_REGEX = "[^0-9]";
+    // private static final String NOT_A_NUMBER_WITH_HYPHEN_REGEX = "[^0-9-]";
+    private static Pattern notAnAlphabetRegex = Pattern.compile("[^a-zA-Z]");
+    private static Pattern notANumberRegex = Pattern.compile("[^0-9]");
+    private static Pattern notANumberWithHyphenRegex = Pattern.compile("[^0-9-]");
+    private static Pattern withHyphenRegex = Pattern.compile("-");
 
     @GetMapping({ "users", "user" })
     public ResponseEntity<List<User>> getUsers() {
@@ -45,9 +49,9 @@ public class DataResourceController {
                 gender.isBlank())
             return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
 
-        if (Pattern.compile(NOT_AN_ALPHABET_FOR_NAME_REGEX).matcher(name).find() ||
-                Pattern.compile(NOT_A_NUMER_REGEX).matcher(age).find() ||
-                Pattern.compile(NOT_AN_ALPHABET_REGEX).matcher(gender).find())
+        if (notAnAlphabetRegex.matcher(name).find() ||
+                notANumberRegex.matcher(age).find() ||
+                notAnAlphabetRegex.matcher(gender).find())
             return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
 
         int count = (int) name.chars().filter(ch -> ch == ' ').count();
@@ -99,7 +103,7 @@ public class DataResourceController {
         if (id.isBlank())
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 
-        if (Pattern.compile(NOT_A_NUMER_REGEX).matcher(id).find())
+        if (notANumberRegex.matcher(id).find())
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 
         try {
@@ -137,10 +141,10 @@ public class DataResourceController {
                 id.isBlank())
             return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
 
-        if (Pattern.compile(NOT_A_NUMER_REGEX).matcher(id).find() ||
-                Pattern.compile(NOT_AN_ALPHABET_FOR_NAME_REGEX).matcher(name).find() ||
-                Pattern.compile(NOT_A_NUMER_REGEX).matcher(age).find() ||
-                Pattern.compile(NOT_AN_ALPHABET_REGEX).matcher(gender).find())
+        if (notANumberRegex.matcher(id).find() ||
+                notAnAlphabetRegex.matcher(name).find() ||
+                notANumberRegex.matcher(age).find() ||
+                notAnAlphabetRegex.matcher(gender).find())
             return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
 
         int count = (int) name.chars().filter(ch -> ch == ' ').count();
@@ -193,7 +197,7 @@ public class DataResourceController {
         if (name.isBlank())
             return getUsers();
 
-        if (Pattern.compile(NOT_AN_ALPHABET_FOR_NAME_REGEX).matcher(name).find())
+        if (notAnAlphabetRegex.matcher(name).find())
             return getUsers();
 
         try {
@@ -214,41 +218,38 @@ public class DataResourceController {
         if (age.isBlank())
             return getUsers();
 
-        Pattern pattern = Pattern.compile(NOT_A_NUMBER_WITH_HYPHEN_REGEX);
         int charPos = 0;
         int charHYPHENCount = 0;
 
         charHYPHENCount = (int) age.chars().filter(ch -> ch == '-').count();
 
         System.out.println("2");
-        // if contains more than 1 HYPHEN and Negation of numbers and HYPHEN then return.
+        // if contains more than 1 HYPHEN and Negation of numbers and HYPHEN then
+        // return.
         if (charHYPHENCount > 1 ||
-                pattern.matcher(age).find())
+                notANumberWithHyphenRegex.matcher(age).find())
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 
         charPos = age.indexOf('-');
 
-        System.out.println("3");
         // if only HYPHEN contains in age AND age len is equals to one OR
-        // if HYPHEN is at index 0 and followed by characters OR if HYPHEN is at index End
+        // if HYPHEN is at index 0 and followed by characters OR if HYPHEN is at index
+        // End
         // then return bad req
         if ((charPos != -1 && age.length() == 1) ||
                 (charPos == 0 || (charPos == age.length() - 1)))
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 
         try {
-            pattern = Pattern.compile("-");
-            System.out.println("4");
-            // if age value is less than 0 or greater IntegerMAX return BadReqest
-            if (!(pattern.matcher(age).find()))
+            // if age value is less than or equals to 0 or
+            // greater return IntegerMAX BadReqest
+            if (!(withHyphenRegex.matcher(age).find()))
                 if (Integer.MAX_VALUE < Long.parseLong(age) ||
                         Integer.parseInt(age) <= 0)
                     return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 
             // if contains only number
-            System.out.println("5");
-            if (!pattern.matcher(age).find()) {
-                System.out.println("Inside 5th block");
+            if (!withHyphenRegex.matcher(age).find()) {
                 int index;
                 index = Integer.parseInt(age);
                 return new ResponseEntity<>(datacontroller
@@ -260,7 +261,6 @@ public class DataResourceController {
             System.out.println("6");
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        System.out.println("Outside fifth block");
 
         int indexOne;
         int indexTwo;
@@ -271,8 +271,6 @@ public class DataResourceController {
             for (int i = 0; i < charPos; i++)
                 tempVar += age.charAt(i);
 
-            System.out.println("7");
-
             if (Long.parseLong(tempVar) > Integer.MAX_VALUE)
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);// BR
 
@@ -282,13 +280,11 @@ public class DataResourceController {
             for (int i = (charPos + 1); i < age.length(); i++)
                 tempVar += age.charAt(i);
 
-            System.out.println("8");
             if (Long.parseLong(tempVar) > Integer.MAX_VALUE)
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);// BR
 
             indexTwo = Integer.parseInt(tempVar);
 
-            System.out.println("9");
             return new ResponseEntity<>(((List<User>) datacontroller
                     .findByAge(indexOne, indexTwo)), HttpStatus.OK);
 
@@ -296,7 +292,6 @@ public class DataResourceController {
             e.printStackTrace();
         }
 
-        System.out.println("10");
         return getUsers();
     }
 
